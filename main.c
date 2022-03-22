@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
+
+
+int foo(){
+	return foo();
+}
 
 void sig_handler(int signum)
 {
@@ -20,30 +26,41 @@ void sig_handler(int signum)
 			printf("signal 2\n");
 			fflush(stdout);
 			k=i/j;
-			printf("lalala\n");
-			fflush(stdout);
-			break;
 		case SIGFPE:
 			printf("signal 3\n");
 			fflush(stdout);
-            raise(SIGINT);
-        case SIGINT:
-            printf("signal 4\n");
-            fflush(stdout);
-            raise(SIGABRT);
-        case SIGABRT:
-            printf("signal 5\n");
-            fflush(stdout);
-            exit(1);
+			int *p;
+			p = 0x1234;
+		case SIGSEGV:
+			printf("signal 4\n");
+			fflush(stdout);
+			abort();
+		case SIGABRT:
+			printf("signal 5\n");
+			fflush(stdout);
+			system("dir");
+		// case SIGINT:
+		// 	printf("signal 6\n");
+		// 	fflush(stdout);
+		// 	system("dir");
+		case SIGSYS:
+			printf("signal 6\n");
+			fflush(stdout);
+			exit(1);
+
 	}
 }
+
 int main()
 {
 	signal (SIGCHLD, sig_handler);
 	signal (SIGUSR1, sig_handler);
 	signal (SIGFPE, sig_handler);
-    signal (SIGINT, sig_handler);
-    signal (SIGABRT , sig_handler);
+    signal (SIGSEGV, sig_handler);
+	signal (SIGABRT , sig_handler);
+	// signal (SIGINT , sig_handler);
+	signal (SIGSYS, sig_handler);
+
 	if (!(fork())) {
 		exit(1);
 	}
